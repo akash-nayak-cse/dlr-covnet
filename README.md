@@ -13,26 +13,15 @@
 
 ## Overview
 
-DLR-CovNet is a lightweight convolutional neural network designed for binary COVID-19 classification from chest X-ray (CXR) images. The proposed architecture combines dual-scale feature extraction with residual learning to capture both local and global radiographic features while maintaining a compact model suitable for deployment in resource-constrained environments.
+DLR-CovNet is a lightweight convolutional neural network for automated COVID-19 classification from chest X-ray (CXR) images. The proposed architecture combines dual-scale feature extraction with residual learning to effectively capture both fine-grained and high-level radiographic patterns while maintaining low computational complexity.
 
-This work was developed as part of my M.E. research and has been published by **Springer**.
+The model was evaluated on the **COVIDx CXR-4** dataset containing **84,818** chest X-ray images. To address severe class imbalance, an **Inverse Class Frequency Re-weighting** strategy was incorporated during training. Despite containing only **2.22 million trainable parameters**, DLR-CovNet achieves competitive classification performance while remaining suitable for deployment in resource-constrained environments.
 
-> **Note:** This repository accompanies the published research paper and serves as a research portfolio. It provides a high-level overview of the proposed methodology while intentionally omitting certain implementation details described in the publication.
+> **Note:** This repository accompanies the published Springer paper and serves as a research portfolio. It provides a high-level overview of the proposed methodology while intentionally omitting certain implementation details described in the publication.
 
 ---
 
-## Research Contributions
-
-The proposed DLR-CovNet introduces several architectural improvements for efficient COVID-19 classification:
-
-* Lightweight CNN with only **2.22 million trainable parameters**
-* Dual-scale feature extraction using parallel **3×3** and **5×5** convolution kernels
-* Novel **Residual Dual-Conv Pooling (RDCP)** blocks
-* Residual learning for improved feature propagation
-* Global Average Pooling (GAP) for parameter-efficient classification
-* Inverse Class Frequency Re-weighting to address dataset imbalance
-
-The proposed architecture achieves competitive classification performance while remaining significantly smaller than many commonly used deep learning models.
+## Research Contributions - Proposed **DLR-CovNet**, a lightweight CNN for automated COVID-19 classification from chest X-ray images. - Introduced an **iterative Residual Dual-Conv Pooling (RDCP)** architecture that progressively learns multi-scale feature representations. - Employed parallel **3×3** and **5×5** convolutional kernels for simultaneous local and global feature extraction. - Addressed dataset imbalance using **Inverse Class Frequency Re-weighting** during training. - Designed a compact architecture with only **2.22M parameters (8.49 MB)**, making it suitable for resource-constrained deployment. - Demonstrated superior performance over several widely used CNN architectures while maintaining significantly lower computational complexity. - Improved model interpretability through **Grad-CAM** visualizations.
 
 ---
 
