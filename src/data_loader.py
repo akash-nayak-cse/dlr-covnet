@@ -1,88 +1,126 @@
-# data_loader.py
-# Dataset mapping, class-weight calculation, and batch generator
+"""
+Data loading utilities for DLR-CovNet.
+
+This module provides helper functions for dataset mapping,
+inverse class frequency weighting, and batch generation.
+
+The complete data preprocessing pipeline accompanying the
+published work is intentionally omitted from this repository.
+"""
 
 import os
-import numpy as np
 import cv2
+import numpy as np
 from sklearn.utils.class_weight import compute_class_weight
+
+import config
 
 
 def create_data_mapping(data_path, label_file):
     """
-    Parse a label text file into a {filename: label} dict.
-    Expected format per line:  <filename> <positive|negative>
+    Creates a filename-to-label mapping from dataset annotations.
 
     Returns:
-        dict[str, int]  — 1 for positive, 0 for negative
+        dict[str, int]
     """
     label_dict = {}
+
     with open(label_file, "r") as f:
         for line in f:
             filename, label = line.strip().split()
-            label_dict[filename] = 1 if label.lower() == "positive" else 0
+            label_dict[filename] = (
+                1 if label.lower() == "positive" else 0
+            )
+
     return label_dict
 
 
 def calculate_class_weights(label_dict):
     """
-    Compute balanced inverse-frequency class weights.
-
-    Returns:
-        dict[int, float]  — {0: weight_neg, 1: weight_pos}
+    Computes inverse-frequency class weights.
     """
-    y = np.array(list(label_dict.values()))
+
+    labels = np.array(list(label_dict.values()))
+
     weights = compute_class_weight(
         class_weight="balanced",
-        classes=np.unique(y),
-        y=y,
+        classes=np.unique(labels),
+        y=labels,
     )
+
     return dict(enumerate(weights))
 
 
-def custom_generator(data_path, label_dict, batch_size, class_weights=None, shuffle=True):
+def custom_generator(
+    data_path,
+    label_dict,
+    batch_size,
+    class_weights=None,
+    shuffle=True,
+):
     """
-    Infinite generator that yields (images, labels) or
-    (images, labels, sample_weights) batches of normalised grayscale images.
-
-    Args:
-        data_path    (str)       : directory containing image files
-        label_dict   (dict)      : {filename: int_label}
-        batch_size   (int)       : number of samples per batch
-        class_weights(dict|None) : if provided, yields per-sample weights
-        shuffle      (bool)      : shuffle at the start of every epoch
-
-    Yields:
-        (np.ndarray, np.ndarray)           if class_weights is None
-        (np.ndarray, np.ndarray, np.ndarray) otherwise
+    Generates normalized grayscale image batches.
     """
+
     filenames = list(label_dict.keys())
-    labels    = list(label_dict.values())
+    labels = list(label_dict.values())
 
     while True:
+
         if shuffle:
-            idx       = np.random.permutation(len(filenames))
-            filenames = [filenames[i] for i in idx]
-            labels    = [labels[i]    for i in idx]
+            indices = np.random.permutation(len(filenames))
 
-        for i in range(0, len(filenames), batch_size):
-            batch_files  = filenames[i : i + batch_size]
-            batch_labels = labels[i : i + batch_size]
+            filenames = [filenames[i] for i in indices]
+            labels = [labels[i] for i in indices]
 
-            batch_images  = []
-            batch_weights = []
+        for start in range(0, len(filenames), batch_size):
+
+            batch_files = filenames[start:start + batch_size]
+            batch_labels = labels[start:start + batch_size]
+
+            images = []
+            sample_weights = []
 
             for filename, label in zip(batch_files, batch_labels):
-                img = cv2.imread(os.path.join(data_path, filename), cv2.IMREAD_GRAYSCALE)
-                img = img.astype(np.float32) / 255.0
-                batch_images.append(img)
+
+                image = cv2.imread(
+                    os.path.join(data_path, filename),
+                    cv2.IMREAD_GRAYSCALE,
+                )
+
+                # Standardize image size
+                image = cv2.resize(
+                    image,
+                    config.INPUT_SHAPE[:2],
+                )
+
+                # Normalize pixel intensities
+                image = image.astype(np.float32) / 255.0
+
+                # Expand channel dimension
+                image = np.expand_dims(image, axis=-1)
+
+                images.append(image)
+
                 if class_weights is not None:
-                    batch_weights.append(class_weights[label])
+                    sample_weights.append(
+                        class_weights[label]
+                    )
+
+            images = np.array(images)
+            batch_labels = np.array(batch_labels)
 
             if class_weights is not None:
+
                 yield (
-                    np.array(batch_images),
-                    np.array(batch_labels),
-                    np.array(batch_weights),
+                    images,
+                    batch_labels,
+                    np.array(sample_weights),
                 )
+
             else:
-                yield np.array(batch_images), np.array(batch_labels)
+
+                yield (
+                    images,
+                    batch_labels,
+                )
