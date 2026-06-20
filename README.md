@@ -21,7 +21,15 @@ The model was evaluated on the **COVIDx CXR-4** dataset containing **84,818** ch
 
 ---
 
-## Research Contributions - Proposed **DLR-CovNet**, a lightweight CNN for automated COVID-19 classification from chest X-ray images. - Introduced an **iterative Residual Dual-Conv Pooling (RDCP)** architecture that progressively learns multi-scale feature representations. - Employed parallel **3×3** and **5×5** convolutional kernels for simultaneous local and global feature extraction. - Addressed dataset imbalance using **Inverse Class Frequency Re-weighting** during training. - Designed a compact architecture with only **2.22M parameters (8.49 MB)**, making it suitable for resource-constrained deployment. - Demonstrated superior performance over several widely used CNN architectures while maintaining significantly lower computational complexity. - Improved model interpretability through **Grad-CAM** visualizations.
+## Research Contributions 
+
+- Proposed **DLR-CovNet**, a lightweight CNN for automated COVID-19 classification from chest X-ray images. 
+- Introduced an **iterative Residual Dual-Conv Pooling (RDCP)** architecture that progressively learns multi-scale feature representations. 
+- Employed parallel **3×3** and **5×5** convolutional kernels for simultaneous local and global feature extraction. 
+- Addressed dataset imbalance using **Inverse Class Frequency Re-weighting** during training. 
+- Designed a compact architecture with only **2.22M parameters (8.49 MB)**, making it suitable for resource-constrained deployment. 
+- Demonstrated superior performance over several widely used CNN architectures while maintaining significantly lower computational complexity. 
+- Improved model interpretability through **Grad-CAM** visualizations.
 
 ---
 
